@@ -66,8 +66,9 @@ export default function LivreurDashboard() {
 
       if (deliveryPhoto) {
         setUpdating(expId)
+        const { data: { user } } = await supabase.auth.getUser()
         const fileExt = deliveryPhoto.name.split('.').pop()
-        const fileName = `${expId}_proof_${Date.now()}.${fileExt}`
+        const fileName = `${user?.id}/${expId}_proof_${Date.now()}.${fileExt}`
         const { error: uploadError } = await supabase.storage
           .from('livraisons')
           .upload(fileName, deliveryPhoto)
