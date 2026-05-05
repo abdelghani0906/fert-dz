@@ -1,5 +1,6 @@
 'use client'
 
+import { use } from 'react'
 import Link from 'next/link'
 import { signup } from '@/app/actions'
 import { ArrowRight, Truck, Loader2 } from 'lucide-react'
@@ -32,10 +33,9 @@ function SubmitButton() {
 export default function RegisterPage({
   searchParams,
 }: {
-  searchParams: any
+  searchParams: Promise<{ error?: string }>
 }) {
-  // Handle searchParams safely
-  const error = searchParams?.error
+  const { error } = use(searchParams)
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] py-12 px-6">

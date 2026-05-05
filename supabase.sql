@@ -15,10 +15,12 @@ CREATE TABLE public.commercants (
 -- 2. Table B : Camionneurs (Ressources)
 CREATE TABLE public.camionneurs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE, -- Lien vers le compte utilisateur
     nom_complet TEXT NOT NULL,
     type_vehicule TEXT NOT NULL, -- Ex: Fourgon, Camion 10t, Semi-remorque
     capacite_max_kg INTEGER NOT NULL,
     wilaya_base TEXT NOT NULL,
+    telephone TEXT, -- Téléphone pour contact
     disponible BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -35,9 +37,11 @@ CREATE TABLE public.expeditions (
     wilaya_arrivee TEXT NOT NULL,
     fournisseur_nom TEXT NOT NULL,
     client_nom TEXT NOT NULL,
-    statut TEXT NOT NULL DEFAULT 'En attente' CHECK (statut IN ('En attente', 'Transit', 'Livré')),
+    statut TEXT NOT NULL DEFAULT 'En attente' CHECK (statut IN ('En attente', 'Récupéré', 'Transit', 'Livré')),
     date_depart DATE NOT NULL,
     fichier_livraison_url TEXT, -- Référence au fichier dans le bucket "livraisons"
+    photo_livraison_url TEXT, -- URL de la photo de preuve de livraison
+    current_location TEXT, -- Position actuelle mise à jour par le chauffeur
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -74,17 +78,25 @@ ON public.camionneurs FOR SELECT TO authenticated USING (true);
 -- ==========================================
 -- POLITIQUES EXPÉDITIONS (Strict RLS)
 -- ==========================================
-CREATE POLICY "SELECT: Commerçants voient uniquement leurs expéditions" 
+CREATE POLICY "SELECT: Commerçants et Camionneurs voient leurs expéditions" 
 ON public.expeditions FOR SELECT 
-TO authenticated USING (auth.uid() = commercant_id);
+TO authenticated 
+USING (
+    auth.uid() = commercant_id OR 
+    camionneur_id IN (SELECT id FROM public.camionneurs WHERE user_id = auth.uid())
+);
 
 CREATE POLICY "INSERT: Commerçants créent leurs propres expéditions" 
 ON public.expeditions FOR INSERT 
 TO authenticated WITH CHECK (auth.uid() = commercant_id);
 
-CREATE POLICY "UPDATE: Commerçants modifient leurs propres expéditions" 
+CREATE POLICY "UPDATE: Commerçants et Camionneurs modifient leurs expéditions" 
 ON public.expeditions FOR UPDATE 
-TO authenticated USING (auth.uid() = commercant_id);
+TO authenticated 
+USING (
+    auth.uid() = commercant_id OR 
+    camionneur_id IN (SELECT id FROM public.camionneurs WHERE user_id = auth.uid())
+);
 
 -- ==========================================
 -- POLITIQUES STORAGE (Dossier personnel)

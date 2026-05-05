@@ -37,9 +37,9 @@ export default async function DashboardPage() {
     .select('statut')
     .eq('commercant_id', user?.id)
     
-  const activeExpeditions = expeditions?.filter(e => e.statut === 'En attente' || e.statut === 'Transit').length || 0
+  const activeExpeditions = expeditions?.filter(e => ['En attente', 'Récupéré', 'Transit'].includes(e.statut)).length || 0
   const completedExpeditions = expeditions?.filter(e => e.statut === 'Livré').length || 0
-  const totalExpeditions = expeditions?.length || 0
+  const totalExpeditions = expeditions?.length || 0;
 
   // 4. Fetch Available Truckers
   const { data: camionneurs, error: camError } = await supabase

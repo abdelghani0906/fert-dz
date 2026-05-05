@@ -100,8 +100,10 @@ export default function CreateExpeditionForm({
         fichier_url = publicUrl
       }
 
-      const { error: insertError } = await supabase.from('expeditions').insert({
-        commercant_id: user.id,
+      // Use the Server Action for self-healing and safety
+      const { createExpedition } = await import('@/app/actions')
+      
+      const payload = {
         camionneur_id: formData.camionneur_id,
         description_marchandise: formData.description_marchandise,
         poids_kg: Number(formData.poids_kg),
@@ -112,9 +114,10 @@ export default function CreateExpeditionForm({
         client_nom: formData.client_nom,
         fichier_livraison_url: fichier_url,
         statut: 'En attente'
-      })
+      }
 
-      if (insertError) throw new Error(insertError.message)
+      const result = await createExpedition(payload)
+      if (!result) throw new Error("Erreur lors de la création")
 
 
 

@@ -5,6 +5,25 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-block, .print-block * {
+    visibility: visible;
+  }
+  .print-block {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  /* Hide UI elements even if they are children of visible elements */
+  nav, button, header, footer {
+    display: none !important;
+  }
+}
+
 :root {
   --background: #080808;
   --foreground: #ffffff;
