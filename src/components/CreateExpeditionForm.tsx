@@ -9,7 +9,7 @@ import {
   Truck, Weight, Calendar, ChevronDown
 } from 'lucide-react'
 
-import { sendSMS, formatNewExpeditionSMS } from '@/lib/sms'
+
 
 type Camionneur = {
   id: string
@@ -116,19 +116,7 @@ export default function CreateExpeditionForm({
 
       if (insertError) throw new Error(insertError.message)
 
-      // --- SMS Notification logic ---
-      const selectedCamionneur = camionneurs.find(c => c.id === formData.camionneur_id)
-      if (selectedCamionneur?.telephone) {
-        const smsMessage = formatNewExpeditionSMS({
-          description: formData.description_marchandise,
-          wilaya_depart: formData.wilaya_depart,
-          wilaya_arrivee: formData.wilaya_arrivee,
-          fournisseur: formData.fournisseur_nom
-        })
-        
-        // Trigger SMS (async, don't wait for it to finish for the UI response)
-        sendSMS(selectedCamionneur.telephone, smsMessage).catch(console.error)
-      }
+
 
       setSuccess(true)
       setTimeout(() => { router.push('/dashboard'); router.refresh() }, 2500)

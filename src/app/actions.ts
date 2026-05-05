@@ -85,17 +85,6 @@ export async function createExpedition(payload: any) {
   }).select().single()
 
   if (error) throw new Error(error.message)
-
-  // 2. Send SMS Notification to the Client
-  try {
-    const { sendSMS, SMS_TEMPLATES } = await import('@/lib/sms')
-    await sendSMS(
-      payload.client_tel, 
-      SMS_TEMPLATES.NEW_EXPEDITION(data.id.split('-')[0], payload.description_marchandise)
-    )
-  } catch (smsErr) {
-    console.error('SMS Notification failed but expedition was created', smsErr)
-  }
-
   return data
 }
+
