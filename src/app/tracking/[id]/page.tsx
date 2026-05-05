@@ -117,16 +117,43 @@ export default async function TrackingDetailsPage({ params }: { params: Promise<
                 </div>
              </div>
 
-             <div className="bg-indigo-600 rounded-[28px] p-6 shadow-xl shadow-indigo-600/20">
-                <h4 className="font-bold text-sm mb-4">📞 Support</h4>
-                <div className="space-y-3">
-                   <div className="bg-white/10 rounded-xl p-3">
-                      <p className="text-[9px] font-black uppercase text-indigo-200">Livreur</p>
-                      <p className="font-mono font-bold text-xs">{exp.camionneurs?.telephone || 'Non assigné'}</p>
+             <div className="bg-indigo-600 rounded-[32px] p-6 shadow-xl shadow-indigo-600/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 blur-3xl -mr-12 -mt-12" />
+                
+                <h4 className="font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+                   <Phone className="w-4 h-4" /> 
+                   Assistance Directe
+                </h4>
+                
+                <div className="space-y-4 relative z-10">
+                   {/* Livreur Info */}
+                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                      <p className="text-[10px] font-black uppercase text-indigo-200 mb-1">Transporteur / Livreur</p>
+                      {exp.camionneurs ? (
+                        <>
+                          <p className="font-bold text-sm mb-2">{exp.camionneurs.nom_complet}</p>
+                          <a href={`tel:${exp.camionneurs.telephone}`} className="inline-flex items-center gap-2 px-3 py-1.5 bg-white text-indigo-600 rounded-lg text-xs font-bold transition-transform active:scale-95 shadow-lg">
+                             <Phone className="w-3.5 h-3.5" />
+                             {exp.camionneurs.telephone}
+                          </a>
+                        </>
+                      ) : (
+                        <p className="text-xs text-indigo-200/50 italic">En attente d'attribution...</p>
+                      )}
                    </div>
-                   <div className="bg-white/10 rounded-xl p-3">
-                      <p className="text-[9px] font-black uppercase text-indigo-200">Fournisseur (Expéditeur)</p>
-                      <p className="font-mono font-bold text-xs">{exp.commercants?.telephone || '---'}</p>
+
+                   {/* Fournisseur Info */}
+                   <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                      <p className="text-[10px] font-black uppercase text-indigo-200 mb-1">Expéditeur (Fournisseur)</p>
+                      <p className="font-bold text-sm mb-2">{exp.commercants?.nom_entreprise || 'Fret-Dz Partner'}</p>
+                      {exp.commercants?.telephone ? (
+                        <a href={`tel:${exp.commercants.telephone}`} className="inline-flex items-center gap-2 px-3 py-1.5 bg-indigo-500 text-white rounded-lg text-xs font-bold transition-transform active:scale-95 border border-white/10">
+                           <Phone className="w-3.5 h-3.5" />
+                           {exp.commercants.telephone}
+                        </a>
+                      ) : (
+                        <p className="text-xs text-indigo-200/50 italic">Numéro non disponible</p>
+                      )}
                    </div>
                 </div>
              </div>
